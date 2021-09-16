@@ -1,97 +1,88 @@
 <template>
   <div class="viewer">
-    <vc-viewer @ready="ready">
-      <vc-heatmap
-        ref="heatMap"
-        :bounds="bounds"
-        :options="options"
-        :min="min"
-        :max="max"
-        :data="data"
-        :type="1"
-        @ready="subReady"
+    <!-- 配置 -->
+    <div v-if="showAction" class="demo-action">
+      <a-button type="primary" @click="flyAllowPath">第一人称漫游</a-button>
+    </div>
+    <vc-viewer
+      ref="vcViewer"
+      :animation="animation"
+      :fullscreenButton="fullscreenButton"
+      :homeButton="homeButton"
+      :infoBox="infoBox"
+      :baseLayerPicker="baseLayerPicker"
+      :vrButton="vrButton"
+      :geocoder="geocoder"
+      :timeline="timeline"
+      :sceneModePicker="true"
+      :autoSortImageryLayers="false"
+      @ready="ready"
+    >
+      <!-- 影像图层 -->
+      <vc-layer-imagery
+        :alpha="alpha"
+        :brightness="brightness"
+        :contrast="contrast"
+        :sortOrder="20"
       >
-      </vc-heatmap>
+        <!-- 百度地图 ok -->
+        <vc-provider-imagery-baidumap
+          :url="url"
+          :projectionTransforms="projectionTransforms"
+        ></vc-provider-imagery-baidumap>
+      </vc-layer-imagery>
     </vc-viewer>
   </div>
 </template>
 <script>
 import { resultData } from '@/js/heatmap.js'
+import { gpsData, flightData } from '@/js/gps.js'
+import transferData from "@/js/transferData";
+const lat = 30.598026044
+const lng = 114.302312702
 export default {
+  name: "HelloWorld",
   data() {
     return {
-      bounds: { west: 80.0, south: 30.0, east: 109.0, north: 50.0 },
-      options: {
-        backgroundColor: 'rgba(0,0,0,0)',
-        gradient: {
-          // enter n keys between 0 and 1 here
-          // for gradient color customization
-          '0.9': 'red',
-          '0.8': 'orange',
-          '0.7': 'yellow',
-          '0.5': 'blue',
-          '0.3': 'green'
-        },
-        // minCanvasSize: 10,
-        // maxCanvasSize: 100,
-        radius: 250,
-        maxOpacity: 0.5,
-        minOpacity: 0,
-        blur: 0.75
+      modelUri: "static/models/Cesium_Air.glb",
+      $$map: {},
+      showAction: false,
+      viewer: null,
+      // 容器配置
+      animation: true,
+      fullscreenButton: true,
+      homeButton: true,
+      infoBox: true,
+      baseLayerPicker: true,
+      vrButton: true,
+      geocoder: true,
+      timeline: true,
+      // 影像图层配置
+      alpha: 1,
+      brightness: 1,
+      contrast: 1,
+      url: "http://shangetu1.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46", //'https://www.songluck.com/map/data/maptile-baidu-chongqing/{z}/{x}/{y}.png',
+      projectionTransforms: {
+        form: 'BD09',
+        to: 'gcj02',//'WGS84'
       },
-      data: [],
-      min: 0,
-      max: 0
+      projectionTransforms1: { from: 'GCJ02', to: 'WGS84' },
     }
   },
   methods: {
+    // 回调函数
     ready(cesiumInstance) {
-      this.cesiumInstance = cesiumInstance
-      const { Cesium, viewer } = this.cesiumInstance
-      let _this = this
-      let data = resultData;
-      _this.bounds = {
-        west: data.left,
-        south: data.bottom,
-        east: data.right,
-        north: data.top
-      }
-      _this.min = data.min
-      _this.max = data.max
-      _this.data = data.datas
+      const { Cesium, viewer } = cesiumInstance;
+      this.viewer = viewer;
+      // 设置颜色
+      this.viewer.scene.globe.depthTestAgainstTerrain = true;
+      this.viewer.scene.globe.imageryLayers.get(0).alpha = 0.0;
+      this.viewer.scene.globe.baseColor = new Cesium.Color(0, 0, 0, 0); //默认为蓝色，这里改成绿色
+      this.showAction = true;
     },
-    subReady({ Cesium, viewer, cesiumObject }) {
-      this.$refs.heatmap.$refs.childRef.createPromise.then(({ Cesium, viewer, cesiumObject }) => {
-        console.log(cesiumObject)
-        if (cesiumObject instanceof Cesium.GroundPrimitive) {
-          setTimeout(() => {
-            const geometry = cesiumObject.geometryInstances.geometry.constructor.createGeometry(cesiumObject.geometryInstances.geometry)
-            viewer.scene.camera.flyToBoundingSphere(geometry.boundingSphere)
-          }, 500)
-        } else if (cesiumObject instanceof Cesium.Entity) {
-          viewer.flyTo(cesiumObject)
-        } else {
-          viewer.camera.flyTo({ destination: cesiumObject.imageryProvider.rectangle })
-        }
-      })
-    },
-    getData(data) {
-      var result = []
-      let rows = data.rows
-      let cols = data.cols
-      let cellX = (data.right - data.left) / cols
-      let cellY = (data.top - data.bottom) / rows
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          let x = data.left + i * cellX
-          let y = data.bottom + j * cellY
-          let value = data.dvalues[i * cols + j]
-          if (value !== data.noDataValue) {
-            result.push({ x: x, y: y, value: value })
-          }
-        }
-      }
-      return result
+
+    flyAllowPath(){
+      
     }
   }
 }
