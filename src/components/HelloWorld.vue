@@ -30,6 +30,7 @@
       <a-button type="primary" @click="pointEntity">监控打点</a-button>
       <a-button type="primary" @click="loadPath">路径</a-button>
       <a-button type="primary" @click="flyAllowPath">第一人称漫游</a-button>
+      <a-button type="primary" @click="changelyAllowPath">第三人称漫游</a-button>
     </div>
     <vc-viewer
       ref="vcViewer"
@@ -162,8 +163,7 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      firstPerspective: false,
-      modelUri: "static/models/Cesium_Air.glb",
+      firstPerspective: true,
       showAction: false,
       viewer: null,
       // 容器配置
@@ -180,7 +180,7 @@ export default {
       alpha: 1,
       brightness: 1,
       contrast: 1,
-      url: "http://shangetu1.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46", 
+      url: "http://shangetu1.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46",
       // url:'https://www.songluck.com/map/data/maptile-baidu-chongqing/{z}/{x}/{y}.png',
       projectionTransforms: {
         form: 'BD09',
@@ -313,7 +313,7 @@ export default {
           this.viewer.scene.primitives.add(tileset);
           this.viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0.0, -0.5, 0));
 
-          var height = 10;
+          var height = 9.5;
 
           // 目的点弧度
           var newPosition = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(106.4763485, 29.65756349, 0))
@@ -330,13 +330,13 @@ export default {
           console.log(error);
         });
 
-      // if (false) {
-      //   //允许可选中构件
-      //   attachTileset(this.viewer, tileset);
-      // } else {
-      //   //模型融合为一体
-      //   attachTilesetX(this.viewer, tileset, "Model", "Model description.");
-      // }
+      if (true) {
+        //允许可选中构件
+        attachTileset(this.viewer, tileset);
+      } else {
+        //模型融合为一体
+        attachTilesetX(this.viewer, tileset, "Model", "Model description.");
+      }
     },
 
     // 加载热力图
@@ -472,6 +472,10 @@ export default {
 
     },
 
+    changelyAllowPath(){
+      this.firstPerspective = false
+    },
+
     // 第一人称视角漫游
     flyAllowPath() {
       this.viewer.scene.globe.depthTestAgainstTerrain = true;
@@ -483,11 +487,16 @@ export default {
         destination: Cesium.Cartesian3.fromDegrees(
           flightData[0].longitude,
           flightData[0].latitude,
-          flightData[0].altitude + 0
-        )
+          flightData[0].altitude + 1
+        ),
+        orientation: {
+          heading: 0, //flightData[0].heading,
+          pitch: 0,//flightData[0].pitch,
+          roll: 0//flightData[0].roll,
+        },
       });
 
-
+      // this.get_camera_height();
 
       // 起始 - 结束时刻
       const startTime = Cesium.JulianDate.fromDate(
@@ -544,8 +553,8 @@ export default {
       const airplaneModel = this.viewer.scene.primitives.add(
         Cesium.Model.fromGltf({
           id: "plane",
-          url: "static/models/Cesium_Air.glb",//this.modelUri
-          scale: 0.01
+          url: "static/models/Duck/Duck.gltf",//this.modelUri
+          scale: 0.3
         })
         // clampAnimations: true, // 非关键帧上保持姿势
         // minimumPixelSize: 128, // 视角上的最小像素大小(这里未生效，应该是哪个模式存在冲突)
@@ -558,7 +567,6 @@ export default {
         // 飞机模型加载完毕，保存视图 model
         // 以便控制动画播放（前进，后退，暂停/播放）
         window.$$map.viewModel = this.viewer.animation.viewModel;
-        console.log('-------22244---------')
         // 添加动画
         // model.activeAnimations.add({
         //   name: "down",
@@ -584,6 +592,7 @@ export default {
         //   multiplier: 1.0,
         //   loop: Cesium.ModelAnimationLoop.NONE
         // });
+        let _this = this;
         this.viewer.clock.onTick.addEventListener(clock => {
           console.log('---------------------')
           const mapObj = window.$$map;
@@ -633,16 +642,21 @@ export default {
           const hpr = Cesium.Transforms.fixedFrameToHeadingPitchRoll(modelMatrix);
 
           if (this.firstPerspective) {
-
+            var cartographic = _this.viewer.scene.globe.ellipsoid.cartesianToCartographic(position);
+            var lat = Cesium.Math.toDegrees(cartographic.latitude);
+            var lng = Cesium.Math.toDegrees(cartographic.longitude);
+            // console.log("第一人称视角position:", cartographic)
+            console.log("第一人称视角position1:", lat,lng,cartographic.height)
+            console.log("第一人称视角hpr:", hpr)
             // 固定视角为第一人称视角
             this.viewer.camera.setView({
               destination: position,
-              orientation: hpr
+              orientation: hpr,
             });
             // 视角偏转至看向前方
-            this.viewer.camera.rotateRight(Cesium.Math.toRadians(-90.0));
-            this.viewer.camera.moveUp(20);
-            this.viewer.camera.moveBackward(20);
+            this.viewer.camera.rotateRight(Cesium.Math.toRadians(0.0));
+            this.viewer.camera.moveUp(1);
+            this.viewer.camera.moveBackward(0);
           }
         });
       });
@@ -678,8 +692,8 @@ export default {
         //   orientationProperty
         // ),
         model: {
-          uri: "static/models/Cesium_Air.glb", // this.modelUri,
-          scale: 0.03// 缩小自动创建的实体至肉眼不可见的状态
+          uri: "static/models/Duck/Duck.gltf",//Cesium_Air.glb", // this.modelUri,
+          scale: 0.2// 缩小自动创建的实体至肉眼不可见的状态
         }
         // loop: Cesium.ModelAnimationLoop.NONE
       });
@@ -1010,6 +1024,28 @@ export default {
       });
       this.viewer.entities.add(entity);
       return entity;
+    },
+
+    // 获取当前相机高，经纬度
+    get_camera_height() {
+      // 获取当前镜头位置的笛卡尔坐标
+      var cameraPosition = this.viewer.camera.position;
+      console.log("弧度方向heading:", this.viewer.camera.heading)
+      // 获取当前坐标系标准
+      var ellipsoid = this.viewer.scene.globe.ellipsoid;
+      // 根据坐标系标准，将笛卡尔坐标转换为地理坐标
+      var cartographic = ellipsoid.cartesianToCartographic(cameraPosition);
+      // 获取镜头的高度
+      var height = cartographic.height;
+      // 根据上面当前镜头的位置，获取该中心位置的经纬度坐标
+      var centerLon = parseFloat(
+        Cesium.Math.toDegrees(cartographic.longitude).toFixed(8)
+      );
+      var centerLat = parseFloat(
+        Cesium.Math.toDegrees(cartographic.latitude).toFixed(8)
+      );
+
+      return { height, centerLon, centerLat };
     },
 
   },
