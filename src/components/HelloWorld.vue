@@ -1,36 +1,73 @@
 <template>
   <div class="viewer">
+    <div class="left"></div>
+    <div class="right"></div>
+    <div class="top"></div>
     <!-- 配置 -->
     <div v-if="showAction" class="demo-action">
-      <div class="demo-tool">
+      <!-- <div class="demo-tool">
         <span>透明度</span>
         <a-slider v-model="alpha" :min="0" :max="1" :step="0.01" />
         <span>亮度</span>
         <a-slider v-model="brightness" :min="0" :max="3" :step="0.01" />
         <span>对比度</span>
         <a-slider v-model="contrast" :min="0" :max="3" :step="0.01" />
-      </div>
-      <a-button type="primary" @click="flyByAircraft">跟随视角漫游</a-button>
-      <a-button type="primary" @click="cartesian3ToDegree"
+      </div> -->
+      <a-button type="primary" size="small" ghost @click="loadBim"
+        >加载九曲河BIM</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="pointEntity"
+        >监控打点</a-button
+      >
+
+      <a-button type="primary" size="small" ghost @click="flyAllowPath"
+        >第一人称漫游</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="flyAllowPathStart"
+        >开始</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="flyAllowPathEnd"
+        >暂停</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="quitFly"
+        >退出第一人称漫游</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="flyByAircraft"
+        >跟随视角漫游</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="changelyAllowPath"
+        >第三人称漫游</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="cartesian3ToDegree"
         >世界坐标转经纬度</a-button
       >
-      <a-button type="primary" @click="degreeToCartesian3([])"
+      <a-button
+        type="primary"
+        size="small"
+        ghost
+        @click="degreeToCartesian3([])"
         >经纬度转世界坐标</a-button
       >
-      <a-button type="primary" @click="addImage">添加图片</a-button>
-      <a-button type="primary" @click="flowWall">墙</a-button>
+      <a-button type="primary" size="small" ghost @click="addImage"
+        >添加图片</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="flowWall"
+        >墙</a-button
+      >
 
-      <a-button type="primary" @click="loadNormalLine">加载普通线</a-button>
-      <a-button type="primary" @click="htmlPanel">加载顶牌</a-button>
-      <a-button type="primary" @click="loadHeatMap">加载热力图</a-button>
-      <!-- <a-button type="primary" @click="loadWaveLine">加载流动线</a-button> -->
+      <a-button type="primary" size="small" ghost @click="htmlPanel"
+        >加载顶牌</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="loadHeatMap"
+        >加载热力图</a-button
+      >
+      <a-button type="primary" size="small" ghost @click="loadWaveLine"
+        >加载飞线</a-button
+      >
       <br /><br />
-      <a-button type="primary" @click="initGltf">加载十年城gltf模型</a-button>
-      <a-button type="primary" @click="loadBim">加载九曲河BIM</a-button>
-      <a-button type="primary" @click="pointEntity">监控打点</a-button>
-      <a-button type="primary" @click="loadPath">路径</a-button>
-      <a-button type="primary" @click="flyAllowPath">第一人称漫游</a-button>
-      <a-button type="primary" @click="changelyAllowPath">第三人称漫游</a-button>
+      <a-button type="primary" size="small" ghost @click="initGltf"
+        >加载十年城gltf模型</a-button
+      >
     </div>
     <vc-viewer
       ref="vcViewer"
@@ -74,6 +111,7 @@
         ></vc-provider-imagery-supermap> -->
 
         <!-- 天地图 no -->
+        <!-- img_c  vec_c -->
         <!-- <vc-provider-imagery-tianditu
           mapStyle="img_c"
           token="436ce7e50d27eede2f2929307e6b33c0"
@@ -81,10 +119,10 @@
         ></vc-provider-imagery-tianditu> -->
 
         <!-- 百度地图 ok -->
-        <vc-provider-imagery-baidumap
+        <!-- <vc-provider-imagery-baidumap
           :url="url"
           :projectionTransforms="projectionTransforms"
-        ></vc-provider-imagery-baidumap>
+        ></vc-provider-imagery-baidumap> -->
       </vc-layer-imagery>
       <!-- 流动墙 -->
       <div v-show="showWall">
@@ -101,9 +139,29 @@
       <!-- 增加点 -->
       <div v-show="showPoint">
         <template v-for="(item, index) in gpsList">
-          <vc-entity :ref="`point${index}`" :position="item" :key="index">
+          <vc-entity
+            :ref="`point${index}`"
+            :position="item"
+            :description="item"
+            :label.sync="label1"
+            :key="index"
+          >
             <vc-graphics-point color="red" :pixelSize="2"></vc-graphics-point>
           </vc-entity>
+          
+          <vc-overlay-html
+            :position="item"
+            :pixelOffset="{ x: -50, y: -30 }"
+            :key="`lay-${index}`"
+          >
+            <div class="vc-dialog-lay">
+              <div>
+                <div class="" v-show="index <= 18">
+                  {{ item.tos_equipmentName }}
+                </div>
+              </div>
+            </div>
+          </vc-overlay-html>
         </template>
       </div>
 
@@ -111,12 +169,12 @@
       <vc-overlay-html
         v-if="showHtml"
         ref="htmlPanel"
-        :position="positionModal"
-        :pixelOffset="{ x: 0, y: -89 }"
+        :position="f"
+        :pixelOffset="{ x: 0, y: -40 }"
       >
         <div class="vc-dialog">
           <div class="main">
-            <div class="">金科服务</div>
+            <div class="">金科智慧服务</div>
           </div>
           <div class="line"></div>
         </div>
@@ -138,7 +196,19 @@
 
       <!-- 普通线 -->
       <div>
-        <vc-trail-polyline
+        <template v-for="(item, index) in positionsParabola">
+          <vc-trail-polyline
+            v-if="showWaveLine"
+            :key="'parabola' + index"
+            :positions="item"
+            color="yellow"
+            imageUrl="https://zouyaoji.top/vue-cesium-v2/statics/SampleData/images/colors1.png"
+            :width="1"
+            :interval="2000"
+            ref="parabola"
+          ></vc-trail-polyline>
+        </template>
+        <!-- <vc-trail-polyline
           :positions="positionsLine"
           color="yellow"
           imageUrl="https://zouyaoji.top/vue-cesium-v2/statics/SampleData/images/colors1.png"
@@ -147,7 +217,7 @@
           :loop="true"
           :clampToGround="true"
           :interval="2000"
-        ></vc-trail-polyline>
+        ></vc-trail-polyline> -->
       </div>
     </vc-viewer>
   </div>
@@ -163,7 +233,7 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      firstPerspective: true,
+      firstPerspective: false,
       showAction: false,
       viewer: null,
       // 容器配置
@@ -191,11 +261,12 @@ export default {
       // 点
       showPoint: false,
       gpsList: [],
+      label1: {},
+      pixelOffset1: { x: -50, y: -30},
 
       // 路径
-      showNormalPath: false,
+      showWaveLine: false,
       positionsLine: [],
-      materialLine: undefined,
 
       // html定牌
       showHtml: false, // 展示html定牌
@@ -230,11 +301,16 @@ export default {
       },
       data: [],
       min: 0,
-      max: 0
+      max: 0,
+      positionsParabola: [],
     };
   },
   mounted() {
     window.$$map = {}
+
+    // 加载跟随漫游的路线
+    this.loadNormalLine();
+
   },
   methods: {
     // 回调函数
@@ -243,8 +319,8 @@ export default {
       this.viewer = viewer;
       // 设置颜色
       this.viewer.scene.globe.depthTestAgainstTerrain = true;
-      this.viewer.scene.globe.imageryLayers.get(0).alpha = 0.0;
-      this.viewer.scene.globe.baseColor = new Cesium.Color(0, 0, 0, 0); //默认为蓝色，这里改成绿色
+      // this.viewer.scene.globe.imageryLayers.get(0).alpha = 0.0;
+      // this.viewer.scene.globe.baseColor = new Cesium.Color(0, 0, 0, 0); //默认为蓝色，这里改成绿色
       this.showAction = true;
       // // 高德 地图不能自定义地图地图样式
       // let imageryProvider = new Cesium.UrlTemplateImageryProvider({
@@ -290,16 +366,25 @@ export default {
 
     // 加载流动线
     loadWaveLine() {
-
+      debugger
+      this.showWaveLine = true
+      let center = { lng: lng - 3, lat: lat - 3 };
+      let points = [{ lng: lng + 5, lat: lat - 5 }, { lng: lng - 6, lat: lat - 6 }, { lng: lng - 7, lat: lat - 3 }];
+      for (let i = 0; i < points.length; i++) {
+        const positions = this.parabolaEquation({ startPoint: center, endPoint: points[i], height: 100000, num: 100 })
+        this.positionsParabola.push(positions)
+      }
     },
 
-    // 加载路径
-    loadPath() {
-
-    },
 
     // 加载BIM
     loadBim() {
+      // this.alpha = 0;
+      // this.brightness = 0;
+      // this.contrast = 0;
+      // this.viewer.scene.globe.baseColor = Cesium.Color.BLACK; //默认为蓝色，这里改成绿色
+      // this.viewer.imageryLayers.get(0).show = false;//不显示底图
+
       "use strict";
 
       var url = "static/changed/tileset.json";
@@ -314,7 +399,6 @@ export default {
           this.viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0.0, -0.5, 0));
 
           var height = 9.5;
-
           // 目的点弧度
           var newPosition = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(106.4763485, 29.65756349, 0))
 
@@ -330,13 +414,13 @@ export default {
           console.log(error);
         });
 
-      if (true) {
-        //允许可选中构件
-        attachTileset(this.viewer, tileset);
-      } else {
-        //模型融合为一体
-        attachTilesetX(this.viewer, tileset, "Model", "Model description.");
-      }
+      // if (true) {
+      //   //允许可选中构件
+      //   attachTileset(this.viewer, tileset);
+      // } else {
+      //   //模型融合为一体
+      //   attachTilesetX(this.viewer, tileset, "Model", "Model description.");
+      // }
     },
 
     // 加载热力图
@@ -472,12 +556,25 @@ export default {
 
     },
 
-    changelyAllowPath(){
+    changelyAllowPath() {
       this.firstPerspective = false
+    },
+
+    quitFly() {
+      this.firstPerspective = false
+    },
+
+    flyAllowPathStart() {
+      this.viewer.clock.shouldAnimate = true
+    },
+
+    flyAllowPathEnd() {
+      this.viewer.clock.shouldAnimate = false
     },
 
     // 第一人称视角漫游
     flyAllowPath() {
+      this.firstPerspective = true;
       this.viewer.scene.globe.depthTestAgainstTerrain = true;
 
       let flightData = transferData(flightDataS);
@@ -554,7 +651,7 @@ export default {
         Cesium.Model.fromGltf({
           id: "plane",
           url: "static/models/Duck/Duck.gltf",//this.modelUri
-          scale: 0.3
+          scale: 0.002
         })
         // clampAnimations: true, // 非关键帧上保持姿势
         // minimumPixelSize: 128, // 视角上的最小像素大小(这里未生效，应该是哪个模式存在冲突)
@@ -594,7 +691,7 @@ export default {
         // });
         let _this = this;
         this.viewer.clock.onTick.addEventListener(clock => {
-          console.log('---------------------')
+          // console.log('---------------------')
           const mapObj = window.$$map;
           // 当前时间
           let curTime = clock.currentTime;
@@ -603,7 +700,11 @@ export default {
           // 4 维矩阵
           let modelMatrix = new Cesium.Matrix4();
           // 跟随视角当前时间点位置中心(笛卡尔三维坐标系坐标位置点 (x, y, z))
+          // console.log("当前时间", clock.currentTime)
+          // console.log("当前position",apObj.airplaneEntity.position.getValue(curTime))
           const position = mapObj.airplaneEntity.position.getValue(curTime);
+          var cartographic = this.viewer.scene.globe.ellipsoid.cartesianToCartographic(position);
+          // console.log("当前position",Cesium.Math.toDegrees(cartographic.longitude))
           // 获取当前时间点四维位置(x, y, z, w)
           // 当前飞机姿态(heading, pitch, roll计算而得)
           let quaternion = Cesium.Property.getValueOrUndefined(
@@ -646,8 +747,8 @@ export default {
             var lat = Cesium.Math.toDegrees(cartographic.latitude);
             var lng = Cesium.Math.toDegrees(cartographic.longitude);
             // console.log("第一人称视角position:", cartographic)
-            console.log("第一人称视角position1:", lat,lng,cartographic.height)
-            console.log("第一人称视角hpr:", hpr)
+            // console.log("第一人称视角position1:", lat, lng, cartographic.height)
+            // console.log("第一人称视角hpr:", hpr)
             // 固定视角为第一人称视角
             this.viewer.camera.setView({
               destination: position,
@@ -693,7 +794,7 @@ export default {
         // ),
         model: {
           uri: "static/models/Duck/Duck.gltf",//Cesium_Air.glb", // this.modelUri,
-          scale: 0.2// 缩小自动创建的实体至肉眼不可见的状态
+          scale: 0.002// 缩小自动创建的实体至肉眼不可见的状态
         }
         // loop: Cesium.ModelAnimationLoop.NONE
       });
@@ -1048,6 +1149,47 @@ export default {
       return { height, centerLon, centerLat };
     },
 
+    // 计算弧线
+    parabolaEquation(options) {
+      // 方程 y=-(4h/L^2)*x^2+h h:顶点高度 L：横纵间距较大者
+      const h = options.height && options.height > 5000 ? options.height : 5000
+      const L =
+        Math.abs(options.startPoint.lng - options.endPoint.lng) > Math.abs(options.startPoint.lat - options.endPoint.lat)
+          ? Math.abs(options.startPoint.lng - options.endPoint.lng)
+          : Math.abs(options.startPoint.lat - options.endPoint.lat)
+      const num = options.num && options.num > 50 ? options.num : 50
+      const result = []
+      let dlt = L / num
+      if (Math.abs(options.startPoint.lng - options.endPoint.lng) > Math.abs(options.startPoint.lat - options.endPoint.lat)) {
+        //以 lng 为基准
+        const delLat = (options.endPoint.lat - options.startPoint.lat) / num
+        if (options.startPoint.lng - options.endPoint.lng > 0) {
+          dlt = -dlt
+        }
+        for (let i = 0; i < num; i++) {
+          const tempH = h - (Math.pow(-0.5 * L + Math.abs(dlt) * i, 2) * 4 * h) / Math.pow(L, 2)
+          const lng = options.startPoint.lng + dlt * i
+          const lat = options.startPoint.lat + delLat * i
+          result.push({ lng, lat, height: tempH })
+        }
+      } else {
+        //以 lat 为基准
+        let dellng = (options.endPoint.lng - options.startPoint.lng) / num
+        if (options.startPoint.lat - options.endPoint.lat > 0) {
+          dlt = -dlt
+        }
+        for (let i = 0; i < num; i++) {
+          const tempH = h - (Math.pow(-0.5 * L + Math.abs(dlt) * i, 2) * 4 * h) / Math.pow(L, 2)
+          const lng = options.startPoint.lng + dellng * i
+          const lat = options.startPoint.lat + dlt * i
+          result.push({ lng, lat, height: tempH })
+        }
+      }
+      // 落地
+      result.push({ lng: options.endPoint.lng, lat: options.endPoint.lat, height: options.endPoint.height || 0 })
+      return result
+    }
+
   },
 };
 </script>
@@ -1058,15 +1200,18 @@ export default {
   height: 100%;
   position: relative;
   color: #ffffff;
+  overflow: hidden;
 }
 
 .demo-action {
   position: absolute;
-  left: 0;
-  top: 1%;
-  width: 20%;
+  left: 1.2%;
+  top: 39%;
+  width: 19%;
   text-align: left;
   z-index: 1;
+  background: #002748;
+  min-height: 28%;
 }
 
 .demo-action button {
@@ -1074,14 +1219,14 @@ export default {
 }
 
 .demo-tool {
-  width: 100%;
+  width: 100px;
 }
 
 .vc-box {
-  width: 220px;
+  /* width: 220px;
   line-height: 150px;
   background: url(../assets/images/img_pop_line.png) no-repeat center;
-  background-size: 100% 100%;
+  background-size: 100% 100%; */
   /* background-color: rgba(0, 0, 0, 0.8); */
   color: #fff;
   /* padding: 8px 16px; */
@@ -1102,8 +1247,8 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  width: 0;
-  height: 89px;
+  width: 40px;
+  height: 40px;
   background: url(../assets/images/img_pop_line.png) no-repeat center;
   background-size: 100% 100%;
   animation: goLine 0.5s forwards;
@@ -1113,25 +1258,26 @@ export default {
     width: 0;
   }
   to {
-    width: 140px;
+    width: 40px;
   }
 }
 .vc-dialog .main {
   position: absolute;
-  width: 240px;
-  height: 100px;
-  top: -90px;
-  left: 138px;
+  width: 150px;
+  height: 70px;
+  line-height: 70px;
+  top: -64px;
+  left: 40px;
   background: url("../assets/images/img_pop.png") no-repeat center;
   background-size: 100% 100%;
   color: white;
+  box-sizing: border-box;
   font-size: 14px;
   user-select: text;
   pointer-events: auto;
   opacity: 0;
   animation: goDynamicLayer 0.5s forwards;
   animation-delay: 0.5s;
-  padding-top: 10px;
   box-sizing: border-box;
 }
 @keyframes goDynamicLayer {
@@ -1148,4 +1294,45 @@ export default {
   width: 100%;
   height: 100%;
 }
+
+.vc-dialog-lay {
+  width: 100px;
+  height: 50px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 35%;
+  height: 100%;
+  background: url(../assets/images/2.png) no-repeat center;
+  background-size: 100% 100%;
+  z-index: 1;
+}
+
+.right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 35%;
+  height: 100%;
+  background: url(../assets/images/3.png) no-repeat center;
+  background-size: 100% 100%;
+  z-index: 1;
+}
+
+.top {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 10%;
+  background: url(../assets/images/1.png) no-repeat center;
+  background-size: 100% 100%;
+  z-index: 1;
+}
 </style>
+

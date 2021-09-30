@@ -143,6 +143,7 @@ let flightDataS = [
         pitch: "-1.5",
         roll: "0.09",
         heading: "90",
+        mark: 0
     },
     {
         time: "14:15:20",
@@ -153,6 +154,7 @@ let flightDataS = [
         pitch: "-1.5",
         roll: "0.09",
         heading: "90",
+        mark: 0
     },
     {
         time: "14:15:44",
@@ -163,6 +165,7 @@ let flightDataS = [
         pitch: "-1.5",
         roll: "0.09",
         heading: "180",
+        mark: 1
     },
     {
         time: "14:17:00",
@@ -173,6 +176,7 @@ let flightDataS = [
         pitch: "-1.5",
         roll: "0.09",
         heading: "180",
+        mark: 0
     },
     {
         time: "14:17:44",
@@ -183,6 +187,7 @@ let flightDataS = [
         pitch: "-1.5",
         roll: "0.09",
         heading: "90",
+        mark: 0
     },
     {
         time: "14:23:24",
@@ -193,6 +198,7 @@ let flightDataS = [
         pitch: "-1.5",
         roll: "0.09",
         heading: "90",
+        mark: 0
     },
 ]
 export {

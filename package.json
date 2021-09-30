@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "ailabel": "^5.1.4",
     "ant-design-vue": "^1.7.8",
     "vue": "^2.5.2",
     "vue-cesium": "^2.2.7",
