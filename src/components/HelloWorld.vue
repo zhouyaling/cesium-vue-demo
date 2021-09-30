@@ -84,46 +84,46 @@
       @ready="ready"
     >
       <!-- 影像图层 -->
-      <vc-layer-imagery
+      <!-- <vc-layer-imagery
         :alpha="alpha"
         :brightness="brightness"
         :contrast="contrast"
         :sortOrder="20"
-      >
-        <!-- mapxbox ok -->
-        <!-- <vc-provider-imagery-mapbox
+      > -->
+      <!-- mapxbox ok -->
+      <!-- <vc-provider-imagery-mapbox
           mapId="mapbox.streets"
         ></vc-provider-imagery-mapbox> -->
 
-        <!-- mapxboxstyle no -->
-        <!-- <vc-provider-imagery-style-mapbox
+      <!-- mapxboxstyle no -->
+      <!-- <vc-provider-imagery-style-mapbox
           url="https://api.mapbox.com/styles/v1"
           username="zhouyaling"
           styleId="cjrbqt0np29ov2stg4uhaul3g"
           accessToken="pk.eyJ1IjoiemhvdXlhbGluZyIsImEiOiJjanJibnQ3Y3cwNmU3NDNwNHBjNHFscWc1In0.ir-kFtEbcIM_X6HhvgByiA"
         ></vc-provider-imagery-style-mapbox> -->
 
-        <!-- 超图 google ok-->
-        <!-- <vc-provider-imagery-supermap
+      <!-- 超图 google ok-->
+      <!-- <vc-provider-imagery-supermap
           ref="imageryProvider"
           url="https://www.supermapol.com/realspace/services/map-World/rest/maps/World_Google"
           @readyPromise="readyPromise"
         ></vc-provider-imagery-supermap> -->
 
-        <!-- 天地图 no -->
-        <!-- img_c  vec_c -->
-        <!-- <vc-provider-imagery-tianditu
+      <!-- 天地图 no -->
+      <!-- img_c  vec_c -->
+      <!-- <vc-provider-imagery-tianditu
           mapStyle="img_c"
           token="436ce7e50d27eede2f2929307e6b33c0"
           :projectionTransforms="projectionTransforms1"
         ></vc-provider-imagery-tianditu> -->
 
-        <!-- 百度地图 ok -->
-        <!-- <vc-provider-imagery-baidumap
+      <!-- 百度地图 ok -->
+      <!-- <vc-provider-imagery-baidumap
           :url="url"
           :projectionTransforms="projectionTransforms"
         ></vc-provider-imagery-baidumap> -->
-      </vc-layer-imagery>
+      <!-- </vc-layer-imagery> -->
       <!-- 流动墙 -->
       <div v-show="showWall">
         <vc-trail-wall
@@ -137,7 +137,7 @@
       </div>
 
       <!-- 增加点 -->
-      <div v-show="showPoint">
+      <!-- <div v-show="showPoint">
         <template v-for="(item, index) in gpsList">
           <vc-entity
             :ref="`point${index}`"
@@ -148,7 +148,7 @@
           >
             <vc-graphics-point color="red" :pixelSize="2"></vc-graphics-point>
           </vc-entity>
-          
+
           <vc-overlay-html
             :position="item"
             :pixelOffset="{ x: -50, y: -30 }"
@@ -163,7 +163,7 @@
             </div>
           </vc-overlay-html>
         </template>
-      </div>
+      </div> -->
 
       <!-- html定牌 -->
       <vc-overlay-html
@@ -262,7 +262,7 @@ export default {
       showPoint: false,
       gpsList: [],
       label1: {},
-      pixelOffset1: { x: -50, y: -30},
+      pixelOffset1: { x: -50, y: -30 },
 
       // 路径
       showWaveLine: false,
@@ -322,19 +322,26 @@ export default {
       // this.viewer.scene.globe.imageryLayers.get(0).alpha = 0.0;
       // this.viewer.scene.globe.baseColor = new Cesium.Color(0, 0, 0, 0); //默认为蓝色，这里改成绿色
       this.showAction = true;
-      // // 高德 地图不能自定义地图地图样式
-      // let imageryProvider = new Cesium.UrlTemplateImageryProvider({
-      //     // url: "https://webst02.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scale=1&style=8",  //   // 路网
-      //     url: "https://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",  //   // 电子街道
+
+      // let imageryProvider = new Cesium.MapboxStyleImageryProvider({
+      //   url: "https://api.mapbox.com/styles/v1",
+      //   username: "zhouyaling",
+      //   styleId: 'cjrbqt0np29ov2stg4uhaul3g',
+      //   accessToken:
+      //     "pk.eyJ1IjoiemhvdXlhbGluZyIsImEiOiJjanJibnQ3Y3cwNmU3NDNwNHBjNHFscWc1In0.ir-kFtEbcIM_X6HhvgByiA",
+      //   scaleFactor: true,
       // });
 
-      // let imageryProvider = new Cesium.ArcGisMapServerImageryProvider({
-      //   url: "http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer", // 蓝色底图
-      //   //   url: "https://lbs.amap.com/dev/mapstyle/mapshare/fb9958c3f4c97d17907059d343d1b055",
+      // let imageryProvider = new Cesium.MapboxStyleImageryProvider({
+      //   // url: "https://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=darkblue&x={x}&y={y}&z={z}",
+      //   url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
       // });
 
-      // viewer.imageryLayers.addImageryProvider(imageryProvider);
+      // this.viewer.imageryLayers.addImageryProvider(imageryProvider);
 
+
+
+      this.loadBim()
       // this.pointLister()
 
     },
@@ -379,11 +386,11 @@ export default {
 
     // 加载BIM
     loadBim() {
-      // this.alpha = 0;
-      // this.brightness = 0;
-      // this.contrast = 0;
-      // this.viewer.scene.globe.baseColor = Cesium.Color.BLACK; //默认为蓝色，这里改成绿色
-      // this.viewer.imageryLayers.get(0).show = false;//不显示底图
+      this.alpha = 0;
+      this.brightness = 0;
+      this.contrast = 0;
+      this.viewer.scene.globe.baseColor = Cesium.Color.BLACK; //默认为蓝色，这里改成绿色
+      this.viewer.imageryLayers.get(0).show = false;//不显示底图
 
       "use strict";
 
@@ -476,6 +483,29 @@ export default {
     pointEntity() {
       this.showPoint = true;
       this.gpsList = gpsData;
+      this.gpsList.forEach((element, index) => {
+        if (index < 17) {
+          var billboard = this.viewer.entities.add({
+            id: element.tos_equipmentName,
+            name: 'billboard',
+            description: '这是一个广告牌',
+            position: new Cesium.Cartesian3.fromDegrees(element.lng, element.lat, element.height + 12),
+            label: {
+              text: element.tos_equipmentName,
+              color: Cesium.Color.fromCssColorString('#fff'),
+              font: 'normal 14px MicroSoft YaHei',
+              showBackground: false,
+              scale: 1,
+              scaleByDistance: new Cesium.NearFarScalar(5, 1.5, 2000, 0),
+            },
+            // billboard: {
+            //   image: require('../assets/images/marker.png'),
+            //   width: 32,
+            //   height: 32
+            // }
+          });
+        }
+      });
     },
 
     // 加载html顶牌
@@ -502,8 +532,22 @@ export default {
       })
     },
 
-    // 加载模型
+    // 加载模型 9003000.0
     initGltf() {
+      this.viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(
+          106.48289044313123,
+          29.61231013622676,
+          1000
+        ),
+        duration: 2,
+        orientation: {
+          heading: Cesium.Math.toRadians(0.0),
+          pitch: Cesium.Math.toRadians(-140),
+          roll: 0,
+        },
+      });
+
       // var url = "../static/models/daochu/daochu.gltf";
       var url = "../static/models/shiniancheng/shiniancheng.gltf";
       var position = Cesium.Cartesian3.fromDegrees(106.485512, 29.609141, 2);
