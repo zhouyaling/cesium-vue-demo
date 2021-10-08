@@ -9,6 +9,7 @@ import mapBase from '@/pages/mapBase' // 基础底图
 import mapAmap from '@/pages/mapAmap' // gaode
 import bmap from '@/pages/mapBmap' // gaode
 import billboard from '@/pages/billboard' // 广告牌
+import line from '@/pages/line' // 广告牌
 
 Vue.use(Router)
 
@@ -61,6 +62,11 @@ export default new Router({
       path: '/billboard',
       name: 'billboard',
       component: billboard
+    },
+    {
+      path: '/line',
+      name: 'line',
+      component: line
     }
   ]
 })

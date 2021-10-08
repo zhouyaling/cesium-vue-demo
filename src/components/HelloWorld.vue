@@ -51,19 +51,21 @@
       <a-button type="primary" size="small" ghost @click="addImage"
         >添加图片</a-button
       >
-      <a-button type="primary" size="small" ghost @click="flowWall"
+      <!-- <a-button type="primary" size="small" ghost @click="flowWall"
         >墙</a-button
-      >
+      > -->
 
-      <a-button type="primary" size="small" ghost @click="htmlPanel"
+      <!-- <a-button type="primary" size="small" ghost @click="htmlPanel"
         >加载顶牌</a-button
-      >
-      <a-button type="primary" size="small" ghost @click="loadHeatMap"
+      > -->
+
+      <!-- <a-button type="primary" size="small" ghost @click="loadHeatMap"
         >加载热力图</a-button
-      >
-      <a-button type="primary" size="small" ghost @click="loadWaveLine"
+      > -->
+      <!-- <a-button type="primary" size="small" ghost @click="loadWaveLine"
         >加载飞线</a-button
-      >
+      > -->
+
       <br /><br />
       <a-button type="primary" size="small" ghost @click="initGltf"
         >加载十年城gltf模型</a-button
@@ -373,7 +375,6 @@ export default {
 
     // 加载流动线
     loadWaveLine() {
-      debugger
       this.showWaveLine = true
       let center = { lng: lng - 3, lat: lat - 3 };
       let points = [{ lng: lng + 5, lat: lat - 5 }, { lng: lng - 6, lat: lat - 6 }, { lng: lng - 7, lat: lat - 3 }];
