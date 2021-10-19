@@ -9,7 +9,8 @@ import mapBase from '@/pages/mapBase' // 基础底图
 import mapAmap from '@/pages/mapAmap' // gaode
 import bmap from '@/pages/mapBmap' // gaode
 import billboard from '@/pages/billboard' // 广告牌
-import line from '@/pages/line' // 广告牌
+import line from '@/pages/line' // 路网
+import coordtransform from '@/pages/coordtransform/coordtransform' // 坐标转换
 
 Vue.use(Router)
 
@@ -67,6 +68,11 @@ export default new Router({
       path: '/line',
       name: 'line',
       component: line
+    },
+    {
+      path: '/coordtransform',
+      name: 'coordtransform',
+      component: coordtransform
     }
   ]
 })

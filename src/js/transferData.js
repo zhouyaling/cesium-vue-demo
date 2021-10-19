@@ -1,4 +1,33 @@
-export default function transferData(data) {
+/**
+ * Created by zhouyaling on 2021/10/12
+ * 经纬度转笛卡尔
+ * @param {*} data 
+ * @returns 
+ */
+
+const  degreeToCartesian3 = function (list) {
+  if (!list || list.length <= 0) {
+    list = [
+      { lng: 106.48314, lat: 29.604911, height: 10 },
+      { lng: 106.481552, lat: 29.611012, height: 10 },
+      { lng: 106.484427, lat: 29.611907, height: 10 },
+    ];
+  }
+  var newList = [];
+  list.forEach((element) => {
+    var item = Cesium.Cartesian3.fromDegrees(
+      element.lng,
+      element.lat,
+      element.height
+    );
+    newList.push(item);
+  });
+
+  console.log("转换坐标：", newList);
+  return newList;
+}
+
+const transferData = function (data) {
     const res = [];
     data.forEach((item) => {
       // item 依旧是数组
@@ -27,3 +56,7 @@ export default function transferData(data) {
     return res;
   }
   
+  export {
+    transferData,
+    degreeToCartesian3
+  }

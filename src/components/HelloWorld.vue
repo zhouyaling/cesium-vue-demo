@@ -17,7 +17,7 @@
         >加载九曲河BIM</a-button
       >
       <a-button type="primary" size="small" ghost @click="pointEntity"
-        >监控打点</a-button
+        >打点</a-button
       >
 
       <a-button type="primary" size="small" ghost @click="flyAllowPath"
@@ -32,22 +32,22 @@
       <a-button type="primary" size="small" ghost @click="quitFly"
         >退出第一人称漫游</a-button
       >
-      <a-button type="primary" size="small" ghost @click="flyByAircraft"
+      <!-- <a-button type="primary" size="small" ghost @click="flyByAircraft"
         >跟随视角漫游</a-button
-      >
-      <a-button type="primary" size="small" ghost @click="changelyAllowPath"
+      > -->
+      <!-- <a-button type="primary" size="small" ghost @click="changelyAllowPath"
         >第三人称漫游</a-button
-      >
+      > -->
       <a-button type="primary" size="small" ghost @click="cartesian3ToDegree"
-        >世界坐标转经纬度</a-button
+        >笛卡尔坐标转经纬度</a-button
       >
-      <a-button
+      <!-- <a-button
         type="primary"
         size="small"
         ghost
         @click="degreeToCartesian3([])"
-        >经纬度转世界坐标</a-button
-      >
+        >经纬度转笛卡尔坐标</a-button
+      > -->
       <a-button type="primary" size="small" ghost @click="addImage"
         >添加图片</a-button
       >
@@ -228,7 +228,8 @@
 <script>
 import { resultData } from '@/js/heatmap.js'
 import { gpsData, flightDataS } from '@/js/gps.js'
-import transferData from "@/js/transferData";
+import { transferData, degreeToCartesian3 } from "@/js/transferData";
+let coordtransformUtil = require('../js/index');
 const lat = 30.598026044
 const lng = 114.302312702
 export default {
@@ -252,7 +253,8 @@ export default {
       alpha: 1,
       brightness: 1,
       contrast: 1,
-      url: "http://shangetu1.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46",
+      url: 'http://api0.map.bdimg.com/customimage/tile?=&x={x}&y={y}&z={z}&scale=1&customid=midnight',
+      //url: "http://shangetu1.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46",
       // url:'https://www.songluck.com/map/data/maptile-baidu-chongqing/{z}/{x}/{y}.png',
       projectionTransforms: {
         form: 'BD09',
@@ -325,27 +327,37 @@ export default {
       // this.viewer.scene.globe.baseColor = new Cesium.Color(0, 0, 0, 0); //默认为蓝色，这里改成绿色
       this.showAction = true;
 
-      // let imageryProvider = new Cesium.MapboxStyleImageryProvider({
-      //   url: "https://api.mapbox.com/styles/v1",
-      //   username: "zhouyaling",
-      //   styleId: 'cjrbqt0np29ov2stg4uhaul3g',
-      //   accessToken:
-      //     "pk.eyJ1IjoiemhvdXlhbGluZyIsImEiOiJjanJibnQ3Y3cwNmU3NDNwNHBjNHFscWc1In0.ir-kFtEbcIM_X6HhvgByiA",
-      //   scaleFactor: true,
-      // });
+      let imageryProvider = new Cesium.MapboxStyleImageryProvider({
+        url: "https://api.mapbox.com/styles/v1",
+        username: "zhouyaling",
+        styleId: 'cjrbqt0np29ov2stg4uhaul3g',
+        accessToken:
+          "pk.eyJ1IjoiemhvdXlhbGluZyIsImEiOiJjanJibnQ3Y3cwNmU3NDNwNHBjNHFscWc1In0.ir-kFtEbcIM_X6HhvgByiA",
+        scaleFactor: true,
+      });
 
       // let imageryProvider = new Cesium.MapboxStyleImageryProvider({
       //   // url: "https://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=darkblue&x={x}&y={y}&z={z}",
       //   url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
       // });
 
-      // this.viewer.imageryLayers.addImageryProvider(imageryProvider);
+      this.viewer.imageryLayers.addImageryProvider(imageryProvider);
 
 
 
       this.loadBim()
       // this.pointLister()
 
+      var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+
+      handler.setInputAction((click) => {
+        console.log('左键单击事件：', click.position);
+        var pick = this.viewer.scene.pick(click.position);
+        if (pick && pick.id) {
+          var cartesian3 = this.viewer.scene.pickPosition(click.position);
+          // var cartesian = cartesian3; //Cesium.Cartesian3.fromDegrees(element.lng, element.lat, 0)
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
     },
 
     // 加载线
@@ -387,15 +399,16 @@ export default {
 
     // 加载BIM
     loadBim() {
-      this.alpha = 0;
-      this.brightness = 0;
-      this.contrast = 0;
-      this.viewer.scene.globe.baseColor = Cesium.Color.BLACK; //默认为蓝色，这里改成绿色
-      this.viewer.imageryLayers.get(0).show = false;//不显示底图
+      // this.alpha = 0;
+      // this.brightness = 0;
+      // this.contrast = 0;
+      // this.viewer.scene.globe.baseColor = Cesium.Color.BLACK; //默认为蓝色，这里改成绿色
+      // this.viewer.imageryLayers.get(0).show = false;//不显示底图
 
       "use strict";
 
-      var url = "static/changed/tileset.json";
+      // var url = "./static/changed/tileset.json";
+      var url = "https://staticfile-service.oss-cn-shanghai.aliyuncs.com/changed/tileset.json"
       var tileset = new Cesium.Cesium3DTileset({
         url: url,
         luminanceAtZenith: 0.2,
@@ -408,7 +421,8 @@ export default {
 
           var height = 9.5;
           // 目的点弧度
-          var newPosition = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(106.4763485, 29.65756349, 0))
+          let nnn = coordtransformUtil.coordtransform.gcj02towgs84(106.4763485, 29.65756349);
+          var newPosition = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(nnn.lng, nnn.lat, 0))
 
           // 模型中心点弧度
           var cartographic = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center);
@@ -422,13 +436,13 @@ export default {
           console.log(error);
         });
 
-      // if (true) {
-      //   //允许可选中构件
-      //   attachTileset(this.viewer, tileset);
-      // } else {
-      //   //模型融合为一体
-      //   attachTilesetX(this.viewer, tileset, "Model", "Model description.");
-      // }
+      if (true) {
+        //允许可选中构件
+        attachTileset(this.viewer, tileset);
+      } else {
+        //模型融合为一体
+        attachTilesetX(this.viewer, tileset, "Model", "Model description.");
+      }
     },
 
     // 加载热力图
@@ -483,7 +497,16 @@ export default {
     // 打点
     pointEntity() {
       this.showPoint = true;
-      this.gpsList = gpsData;
+      // this.gpsList = gpsData;
+      let cacheData = gpsData.map((element, index) => {
+        let newLoglat = coordtransformUtil.coordtransform.gcj02towgs84(element.lng, element.lat);
+        return {
+          ...element, lat: newLoglat.lat,
+          lng: newLoglat.lng
+        }
+      })
+      this.gpsList = cacheData;
+
       this.gpsList.forEach((element, index) => {
         if (index < 17) {
           var billboard = this.viewer.entities.add({
@@ -493,8 +516,8 @@ export default {
             position: new Cesium.Cartesian3.fromDegrees(element.lng, element.lat, element.height + 12),
             label: {
               text: element.tos_equipmentName,
-              color: Cesium.Color.fromCssColorString('#fff'),
-              font: 'normal 14px MicroSoft YaHei',
+              color: Cesium.Color.fromCssColorString('#FD0707'),
+              font: 'normal 24px MicroSoft YaHei',
               showBackground: false,
               scale: 1,
               scaleByDistance: new Cesium.NearFarScalar(5, 1.5, 2000, 0),
@@ -550,7 +573,8 @@ export default {
       });
 
       // var url = "../static/models/daochu/daochu.gltf";
-      var url = "../static/models/shiniancheng/shiniancheng.gltf";
+      // var url = "https://101.200.194.246:8999/shiniancheng/shiniancheng.gltf";
+      var url = "https://staticfile-service.oss-cn-shanghai.aliyuncs.com/shiniancheng/shiniancheng.gltf"
       var position = Cesium.Cartesian3.fromDegrees(106.485512, 29.609141, 2);
       var heading = Cesium.Math.toRadians(89);
       var pitch = 0;
@@ -622,7 +646,15 @@ export default {
       this.firstPerspective = true;
       this.viewer.scene.globe.depthTestAgainstTerrain = true;
 
-      let flightData = transferData(flightDataS);
+      let cacheData = flightDataS.map((element, index) => {
+        let newLoglat = coordtransformUtil.coordtransform.gcj02towgs84(element.lng, element.lat);
+        return {
+          ...element, lat: newLoglat.lat,
+          lng: newLoglat.lng
+        }
+      })
+
+      let flightData = transferData(cacheData);
 
       // 相机飞至起始位置点
       this.viewer.camera.flyTo({
@@ -695,7 +727,7 @@ export default {
       const airplaneModel = this.viewer.scene.primitives.add(
         Cesium.Model.fromGltf({
           id: "plane",
-          url: "static/models/Duck/Duck.gltf",//this.modelUri
+          url: "https://staticfile-service.oss-cn-shanghai.aliyuncs.com/Duck/Duck.gltf",//this.modelUri
           scale: 0.002
         })
         // clampAnimations: true, // 非关键帧上保持姿势
@@ -838,7 +870,7 @@ export default {
         //   orientationProperty
         // ),
         model: {
-          uri: "static/models/Duck/Duck.gltf",//Cesium_Air.glb", // this.modelUri,
+          uri: "https://staticfile-service.oss-cn-shanghai.aliyuncs.com/Duck/Duck.gltf",//Cesium_Air.glb", // this.modelUri,
           scale: 0.002// 缩小自动创建的实体至肉眼不可见的状态
         }
         // loop: Cesium.ModelAnimationLoop.NONE
@@ -928,7 +960,37 @@ export default {
 
     // 跟随漫游
     flyByAircraft() {
-      let newPositions = this.degreeToCartesian3(this.positionsLine);
+      // var center = Cesium.Cartesian3.fromDegrees(this.positionsLine[0].lng, this.positionsLine[0].lat, 600); // 位置
+      // var heading = Cesium.Math.toRadians(0.0);
+      // var pitch = Cesium.Math.toRadians(-90);
+      // var range = 60000;
+      // this.viewer.camera.lookAt(
+      //   center,
+      //   new Cesium.HeadingPitchRange(heading, pitch, range)
+      // );
+
+      let newPose = [
+        { "lat": 29.65876349, "lng": 106.4766485, "tos_equipmentName": "周界_防区1", "height": 10 },
+        { "lat": 29.65845627, "lng": 106.4764876, "tos_equipmentName": "周界_防区2", "height": 10 },
+        { "lat": 29.65832109, "lng": 106.4762033, "tos_equipmentName": "周界_防区3", "height": 10 },
+        { "lat": 29.6581859, "lng": 106.4759351, "tos_equipmentName": "周界_防区4", "height": 10 },
+        { "lat": 29.65803673, "lng": 106.4757741, "tos_equipmentName": "周界_防区5", "height": 10 },
+        { "lat": 29.6575659, "lng": 106.4757741, "tos_equipmentName": "周界_防区6", "height": 10 },
+        { "lat": 29.65737011, "lng": 106.4757634, "tos_equipmentName": "周界_防区7", "height": 10 },
+        { "lat": 29.65727688, "lng": 106.4755649, "tos_equipmentName": "周界_防区8", "height": 10 },
+        { "lat": 29.65726755, "lng": 106.4752538, "tos_equipmentName": "周界_防区9", "height": 10 },
+        { "lat": 29.65710906, "lng": 106.4748622, "tos_equipmentName": "周界_防区10", "height": 10 },
+        { "lat": 29.65684334, "lng": 106.4749534, "tos_equipmentName": "周界_防区11", "height": 10 },
+        { "lat": 29.65647973, "lng": 106.475066, "tos_equipmentName": "周界_防区12", "height": 10 },
+        { "lat": 29.6563492, "lng": 106.4755327, "tos_equipmentName": "周界_防区13", "height": 10 },
+        { "lat": 29.65635386, "lng": 106.4760155, "tos_equipmentName": "周界_防区14", "height": 10 },
+        { "lat": 29.65635386, "lng": 106.4764983, "tos_equipmentName": "周界_防区15", "height": 10 },
+        { "lat": 29.6564704, "lng": 106.477759, "tos_equipmentName": "周界_防区16", "height": 10 },
+        { "lat": 29.65771041, "lng": 106.4778502, "tos_equipmentName": "周界_防区17", "height": 10 },
+        { "lat": 29.65880755, "lng": 106.4778394, "tos_equipmentName": "周界_防区18", "height": 10 },
+        { "lat": 29.65876349, "lng": 106.4766485, "tos_equipmentName": "周界_防区1", "height": 10 }
+      ];
+      let newPositions = degreeToCartesian3(newPose);
       let ALLLength = this.getPositionsLength(newPositions);
       let eachStep = 0.05;
 
@@ -962,6 +1024,7 @@ export default {
         ); //时间递增
         position.addSample(time, newPositions[i]);
       }
+      console.log("-----", position)
       let entity = this.viewer.entities.add({
         availability: new Cesium.TimeIntervalCollection([
           new Cesium.TimeInterval({
@@ -970,9 +1033,9 @@ export default {
           }),
         ]),
         model: {
-          uri: "static/models/Cesium_Air.glb",
+          uri: "https://staticfile-service.oss-cn-shanghai.aliyuncs.com/Duck/Duck.gltf",
           minimumPixelSize: 1,
-          maximumScale: 0.4,
+          maximumScale: 0.0004,
         },
         position: position,
         orientation: new Cesium.VelocityOrientationProperty(position),
@@ -1075,27 +1138,27 @@ export default {
     },
 
     // 经纬度坐标转世界坐标
-    degreeToCartesian3(list) {
-      if (!list || list.length <= 0) {
-        list = [
-          { lng: 106.48314, lat: 29.604911, height: 10 },
-          { lng: 106.481552, lat: 29.611012, height: 10 },
-          { lng: 106.484427, lat: 29.611907, height: 10 },
-        ];
-      }
-      var newList = [];
-      list.forEach((element) => {
-        var item = Cesium.Cartesian3.fromDegrees(
-          element.lng,
-          element.lat,
-          element.height
-        );
-        newList.push(item);
-      });
+    // degreeToCartesian3(list) {
+    //   if (!list || list.length <= 0) {
+    //     list = [
+    //       { lng: 106.48314, lat: 29.604911, height: 10 },
+    //       { lng: 106.481552, lat: 29.611012, height: 10 },
+    //       { lng: 106.484427, lat: 29.611907, height: 10 },
+    //     ];
+    //   }
+    //   var newList = [];
+    //   list.forEach((element) => {
+    //     var item = Cesium.Cartesian3.fromDegrees(
+    //       element.lng,
+    //       element.lat,
+    //       element.height
+    //     );
+    //     newList.push(item);
+    //   });
 
-      console.log("转换坐标：", newList);
-      return newList;
-    },
+    //   console.log("转换坐标：", newList);
+    //   return newList;
+    // },
 
     readyPromise() {
       this.viewer.zoomTo(this.$refs.imageryProvider.providerContainer.imageryLayer)

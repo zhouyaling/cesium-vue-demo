@@ -12,6 +12,8 @@
   "dependencies": {
     "ailabel": "^5.1.4",
     "ant-design-vue": "^1.7.8",
+    "cesium-heatmap": "0.0.4",
+    "heatmap.js": "^2.0.5",
     "jquery": "^3.6.0",
     "vue": "^2.5.2",
     "vue-cesium": "^2.2.7",

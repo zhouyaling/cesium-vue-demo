@@ -1,0 +1,54 @@
+{
+  "_from": "cesium-heatmap",
+  "_id": "cesium-heatmap@0.0.4",
+  "_inBundle": false,
+  "_integrity": "sha1-bZchPAh0jdJU4J7HSNlB6geNmKc=",
+  "_location": "/cesium-heatmap",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cesium-heatmap",
+    "name": "cesium-heatmap",
+    "escapedName": "cesium-heatmap",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.nlark.com/cesium-heatmap/download/cesium-heatmap-0.0.4.tgz",
+  "_shasum": "6d97213c08748dd254e09ec748d941ea078d98a7",
+  "_spec": "cesium-heatmap",
+  "_where": "E:\\_zyl\\_demo\\cesium-vue-demo",
+  "author": {
+    "name": "danwild@y7mail"
+  },
+  "bugs": {
+    "url": "https://github.com/danwild/CesiumHeatmap/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "A helper to add heatmaps (using heatmap.js) to CesiumJS",
+  "homepage": "https://github.com/danwild/CesiumHeatmap#readme",
+  "keywords": [
+    "cesium",
+    "cesiumjs",
+    "heatmap",
+    "visualisation",
+    "visualization"
+  ],
+  "license": "MIT",
+  "main": "CesiumHeatmap.js",
+  "name": "cesium-heatmap",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danwild/CesiumHeatmap.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.0.4"
+}

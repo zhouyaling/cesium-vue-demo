@@ -52,6 +52,18 @@
           <div>嵌入TOS</div>
         </div>
       </article>
+
+      <article>
+        <h1 class="">坐标转换</h1>
+        <div class="item">
+          <div  @click="routePage('coordtransform')">坐标转换</div>
+        </div>
+      </article>
+      <article>
+        <div>
+          <a href="http://datav.aliyun.com/tools/atlas/index.html">datav</a>
+        </div>
+      </article>
     </section>
   </div>
 </template>
